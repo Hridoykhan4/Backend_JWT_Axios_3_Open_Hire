@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import JobCard from "./JobCard";
 import LoadingSpinner from "./LoadingSpinner";
-
+import React from "react";
+import useAxiosSecure from "../hooks/useAxiosSecure";
+const categories = ["Web Development", "Graphics Design", "Digital Marketing"];
 const TabCategories = () => {
+  const axiosSecure = useAxiosSecure();
   const {
     data: jobs = [],
     isPending,
@@ -10,12 +13,29 @@ const TabCategories = () => {
     error,
   } = useQuery({
     queryKey: ["allJobs"],
-    queryFn: () =>
-      fetch(`http://localhost:5000/jobs`).then((res) => res.json()),
+    queryFn: () => axiosSecure(`/jobs`).then((res) => res.data),
     retry: 4,
   });
 
+  const renderTabContent = (category) => (
+    <div className="tab-content bg-base-100 border-base-300 p-6">
+      <div className="grid overflow-hidden grid-cols-1 gap-8 mt-8 xl:mt-16 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {jobs
+          .filter((j) => j.category === category)
+          .map((job) => (
+            <JobCard job={job} key={job._id}></JobCard>
+          ))}
+      </div>
+    </div>
+  );
+
   if (isPending) return <LoadingSpinner></LoadingSpinner>;
+  if (error || isError)
+    return (
+      <p className="text-center my-4 text-red-700 font-semibold">
+        Failed to load data! {error?.message || "Unknown error occurred."}
+      </p>
+    );
   return (
     <div className="mt-5">
       <div>
@@ -31,56 +51,19 @@ const TabCategories = () => {
       </div>
 
       {/* Tabs */}
-      {/* name of each tab group should be unique */}
       <div className="tabs justify-center items-center flex-wrap tabs-box">
-        <input
-          type="radio"
-          name="my_tabs_6"
-          className="tab"
-          aria-label="Web Development"
-          defaultChecked
-        />
-        <div className="tab-content bg-base-100 border-base-300 p-6">
-          <div className="grid grid-cols-1 gap-8 mt-8 xl:mt-16 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {jobs
-              .filter((j) => j.category === "Web Development")
-              .map((job) => (
-                <JobCard job={job} key={job._id}></JobCard>
-              ))}
-          </div>
-        </div>
-
-        <input
-          type="radio"
-          name="my_tabs_6"
-          className="tab"
-          aria-label="Graphics Design"
-        />
-        <div className="tab-content bg-base-100 border-base-300 p-6">
-          <div className="grid grid-cols-1 gap-8 mt-8 xl:mt-16 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {jobs
-              .filter((j) => j.category === "Graphics Design")
-              .map((job) => (
-                <JobCard job={job} key={job._id}></JobCard>
-              ))}
-          </div>
-        </div>
-
-        <input
-          type="radio"
-          name="my_tabs_6"
-          className="tab"
-          aria-label="Digital Marketing"
-        />
-        <div className="tab-content bg-base-100 border-base-300 p-6">
-          <div className="grid grid-cols-1 gap-8 mt-8 xl:mt-16 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {jobs
-              .filter((j) => j.category === "Digital Marketing")
-              .map((job) => (
-                <JobCard job={job} key={job._id}></JobCard>
-              ))}
-          </div>
-        </div>
+        {categories.map((category, i) => (
+          <React.Fragment key={category}>
+            <input
+              type="radio"
+              name="my_tabs_6"
+              className="tab"
+              aria-label={category}
+              defaultChecked={i === 0}
+            />
+            {renderTabContent(category)}
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );
