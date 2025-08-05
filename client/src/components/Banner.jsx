@@ -42,7 +42,7 @@ const Banner = () => {
               </motion.p>
 
               <motion.button
-                onClick={() => nav("/all-jobs")}
+                onClick={() => nav("/jobs")}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.8, duration: 0.4 }}

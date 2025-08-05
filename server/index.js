@@ -29,6 +29,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         const jobsCollection = client.db('Open-hire').collection('jobs');
+        const bidsCollection = client.db('Open-hire').collection('bids');
 
         // Get All Jobs
         app.get('/jobs', async (req, res) => {
@@ -71,11 +72,59 @@ async function run() {
                     ...jobData
                 }
             }
-
             const result = await jobsCollection.updateOne({ _id: new ObjectId(id) }, updateJob, { upsert: true });
             res.send(result)
-
         })
+
+        /*  ********
+        Bid related APIs Start
+        **********/
+
+        // Post a bid
+        app.post('/add-bid', async (req, res) => {
+            // Check whether exist twice
+            console.log(req.body)
+            const alreadyExist = await bidsCollection.findOne({
+                jobId: req.body.jobId, bidder_email: req.body.
+                    bidder_email
+            });
+            if (!!alreadyExist) {
+                return res.status(409).send({ message: 'Already applied for the job' })
+            }
+            const query = { _id: new ObjectId(req.body.jobId) }
+            const updateBidCount = {
+                $inc: { bid_count: 1 }
+            }
+
+            const updateBid = await jobsCollection.updateOne(query, updateBidCount)
+
+            res.send(await bidsCollection.insertOne(req.body))
+        })
+
+
+
+        // Get all bids a specific user made
+        app.get('/my-bids/:email', async (req, res) => {
+            const { email } = req.params;
+            const query = { bidder_email: email };
+            const result = await bidsCollection.find(query).toArray();
+            res.send(result)
+        })
+
+
+        // Get all bid requests posted by all bidders
+        app.get('/bid-requests/:email', async (req, res) => {
+            const { email } = req.params;
+            const query = { 'buyer.email': email };
+            const result = await bidsCollection.find(query).toArray();
+            res.send(result)
+        })
+
+
+        /*  ********
+        Bid related APIs End
+        **********/
+
 
 
         await client.db("admin").command({ ping: 1 });

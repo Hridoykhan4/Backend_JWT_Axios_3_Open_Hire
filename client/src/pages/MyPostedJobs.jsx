@@ -178,13 +178,12 @@ const MyPostedJobs = () => {
                           </span>
                         </td>
                         <td
-                          className="px-4 py-4 text-gray-500 whitespace-nowrap"
+                          className="px-4 py-4 text-gray-500 whitespace-nowrap max-w-[180px] truncate"
                           title={job.description}
                         >
-                          {job.description.length > 30
-                            ? `${job.description.slice(0, 30)}...`
-                            : job.description}
+                          {job.description}
                         </td>
+
                         <td className="px-4 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-x-4">
                             <button
