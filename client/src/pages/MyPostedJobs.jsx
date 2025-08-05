@@ -113,7 +113,9 @@ const MyPostedJobs = () => {
 
       {jobs.length === 0 ? (
         <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-300 p-8 rounded-xl text-center shadow-md">
-          <h3 className="text-2xl font-bold text-blue-700">🚫 No Jobs Posted</h3>
+          <h3 className="text-2xl font-bold text-blue-700">
+            🚫 No Jobs Posted
+          </h3>
           <p className="mt-2 text-sm text-blue-600">
             You haven’t posted anything yet. Time to show your first job to the
             world!

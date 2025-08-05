@@ -8,6 +8,7 @@ import AllJobs from "../pages/AllJobs";
 import Login from "../pages/Authentication/Login";
 import Registration from "../pages/Authentication/Register";
 import UpdateJob from "../pages/UpdateJob";
+import JobDetails from "../pages/JobDetails";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "/update/:id",
         element: <UpdateJob></UpdateJob>,
+      },
+      {
+        path: "/job/:id",
+        element: <JobDetails></JobDetails>,
       },
     ],
   },
