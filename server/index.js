@@ -33,7 +33,24 @@ async function run() {
 
         // Get All Jobs
         app.get('/jobs', async (req, res) => {
-            const result = await jobsCollection.find({}).toArray();
+            const { filter, search, sort } = req.query;
+            let query = {}
+            if (filter) {
+                query = { category: filter }
+            }
+            if (search) {
+                query = { job_title: { $regex: search, $options: "i" } }
+            }
+
+            let cursor = jobsCollection.find(query);
+            if (sort === 'asc') {
+                cursor = cursor.sort({ deadline: 1 })
+            }
+            else if (sort === "dsc") {
+                cursor = cursor.sort({ deadline: -1 })
+            }
+
+            const result = await cursor.toArray();
             res.send(result)
         })
 
@@ -118,6 +135,18 @@ async function run() {
             const query = { 'buyer.email': email };
             const result = await bidsCollection.find(query).toArray();
             res.send(result)
+        })
+
+        // Update Status
+        app.patch('/update-status/:id', async (req, res) => {
+            const { id } = req.params;
+            const query = { _id: new ObjectId(id) };
+            const status = req.body
+            const updateStatus = {
+                $set: status
+            }
+            const result = await bidsCollection.updateOne(query, updateStatus);
+            res.send(result);
         })
 
 

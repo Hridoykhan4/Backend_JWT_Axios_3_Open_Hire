@@ -1,11 +1,13 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useAxiosSecure from "../hooks/useAxiosSecure";
 import useAuthValue from "../hooks/useAuthValue";
 import LoadingSpinner from "../components/LoadingSpinner";
+import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 const MyBids = () => {
   const axiosSecure = useAxiosSecure();
-  // const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
   const { user } = useAuthValue();
 
   const categoryBadge = (category) => {
@@ -29,6 +31,28 @@ const MyBids = () => {
     enabled: !!user?.email,
   });
 
+  const { mutateAsync } = useMutation({
+    mutationFn: async ({ id, status }) => {
+      const { data } = await axiosSecure.patch(`/update-status/${id}`, {
+        status,
+      });
+      if (data?.modifiedCount) {
+        toast.success(`Updated status to ${status}`);
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["bid-requests"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["myBids"] });
+    },
+  });
+
+  const handleStatus = async (id, status) => {
+    await mutateAsync({ id, status });
+  };
+
   if (isPending) return <LoadingSpinner />;
   if (isError)
     return (
@@ -49,18 +73,15 @@ const MyBids = () => {
 
       {jobs.length === 0 ? (
         <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-300 p-8 rounded-xl text-center shadow-md">
-          <h3 className="text-2xl font-bold text-blue-700">
-            🚫 No Jobs Posted
-          </h3>
+          <h3 className="text-2xl font-bold text-blue-700">🚫 No Bid Jobs</h3>
           <p className="mt-2 text-sm text-blue-600">
-            You haven’t posted anything yet. Time to show your first job to the
-            world!
+            You haven’t bid in any job yet. Time to bid now!
           </p>
           <Link
-            to="/add-job"
+            to="/jobs"
             className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
           >
-            Post a Job
+            Find Jobs to Bid!
           </Link>
         </div>
       ) : (
@@ -99,7 +120,7 @@ const MyBids = () => {
                         </td>
 
                         <td className="px-4 py-4 text-sm text-gray-500  whitespace-nowrap">
-                          {job?.deadline}
+                          {new Date(job?.deadline).toLocaleDateString("en-GB")}
                         </td>
 
                         <td className="px-4 py-4 text-sm text-gray-500  whitespace-nowrap">
@@ -118,7 +139,18 @@ const MyBids = () => {
                         </td>
                         <td className="px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap">
                           <div
-                            className={`inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-yellow-100/60 text-yellow-500`}
+                            className={`inline-flex ${
+                              job?.status === "Pending" &&
+                              "bg-yellow-100/60 text-yellow-500"
+                            }
+                            ${
+                              job?.status === "In Progress" &&
+                              "bg-emerald-100/60 text-emerald-500"
+                            }
+                            ${
+                              job?.status === "Rejected" &&
+                              "bg-red-100/60 text-red-500"
+                            } items-center px-3 py-1 rounded-full gap-x-2`}
                           >
                             <span
                               className={`h-1.5 w-1.5 rounded-full bg-yellow-500 `}
@@ -132,7 +164,8 @@ const MyBids = () => {
                           <button
                             disabled={job?.status !== "In Progress"}
                             title="Mark Complete"
-                            className="text-gray-500 transition-colors duration-200   hover:text-red-500 focus:outline-none disabled:cursor-not-allowed"
+                            onClick={() => handleStatus(job?._id, "Completed")}
+                            className="text-gray-500 cursor-pointer transition-colors duration-200   hover:text-red-500 focus:outline-none disabled:cursor-not-allowed"
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"

@@ -16,6 +16,7 @@ const JobDetails = () => {
   const { user } = useAuthValue();
   const queryClient = useQueryClient();
   const [startDate, setStartDate] = useState(new Date());
+
   const {
     register,
     handleSubmit,
@@ -95,6 +96,7 @@ const JobDetails = () => {
         toast.success("Bid placed successfully!");
         queryClient.invalidateQueries({ queryKey: ["jobsAllData"] });
         queryClient.invalidateQueries({ queryKey: ["allJobs"] });
+        queryClient.invalidateQueries({ queryKey: ["bid-requests"] });
         refetch();
         nav("/my-bids");
       }
@@ -108,6 +110,9 @@ const JobDetails = () => {
       }
     }
   };
+
+
+
 
   return (
     <div className="flex flex-col md:flex-row justify-around gap-5 items-center min-h-[calc(100vh-306px)] md:max-w-screen-xl mx-auto">
