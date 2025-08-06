@@ -1,79 +1,167 @@
 import logo from "../assets/images/logo.png";
-import { Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import useAuthValue from "../hooks/useAuthValue";
+
 const Navbar = () => {
   const { user, logOut } = useAuthValue();
 
   return (
-    <div className="navbar  w-11/12  mx-auto">
-      <div className="flex-1">
-        <Link to="/" className="flex gap-2 items-center">
-          <img className="w-auto h-7" src={logo} alt="" />
-          <span className="font-bold">SoloSphere</span>
-        </Link>
-      </div>
-      <div className="flex-none">
-        <ul className="menu menu-horizontal px-1">
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/jobs">All Jobs</Link>
-          </li>
+    <nav className="w-full shadow-sm bg-white">
+      <div className="navbar max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
+            <img className="h-8 w-auto" src={logo} alt="SoloSphere Logo" />
+            <span className="text-xl font-bold tracking-wide text-gray-800">
+              SoloSphere
+            </span>
+          </Link>
+        </div>
 
-          {!user && (
+        {/* Navigation Links */}
+        <div className="flex items-center gap-6">
+          <ul className="hidden md:flex items-center gap-6">
             <li>
-              <Link to="/login">Login</Link>
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `text-sm font-medium uppercase tracking-wide transition hover:text-blue-600 ${
+                    isActive
+                      ? "text-blue-600 border-b-2 border-blue-600 pb-1"
+                      : "text-gray-600"
+                  }`
+                }
+              >
+                Home
+              </NavLink>
             </li>
-          )}
-        </ul>
+            <li>
+              <NavLink
+                to="/jobs"
+                className={({ isActive }) =>
+                  `text-sm font-medium uppercase tracking-wide transition hover:text-blue-600 ${
+                    isActive
+                      ? "text-blue-600 border-b-2 border-blue-600 pb-1"
+                      : "text-gray-600"
+                  }`
+                }
+              >
+                All Jobs
+              </NavLink>
+            </li>
 
-        {user && (
-          <div className="dropdown dropdown-end z-50">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle avatar"
-            >
-              <div title={user?.displayName} className="w-10 rounded-full">
-                <img
-                  referrerPolicy="no-referrer"
-                  alt="User Profile Photo"
-                  src={user?.photoURL}
-                />
-              </div>
-            </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
-            >
+            {!user && (
               <li>
-                <Link to="/add-job" className="justify-between">
-                  Add Job
-                </Link>
-              </li>
-              <li>
-                <Link to="/my-posted-jobs">My Posted Jobs</Link>
-              </li>
-              <li>
-                <Link to="/my-bids">My Bids</Link>
-              </li>
-              <li>
-                <Link to="/bid-requests">Bid Requests</Link>
-              </li>
-              <li className="mt-2">
-                <button
-                  onClick={logOut}
-                  className="bg-gray-200 block text-center"
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    `text-sm font-medium uppercase tracking-wide transition hover:text-blue-600 ${
+                      isActive
+                        ? "text-blue-600 border-b-2 border-blue-600 pb-1"
+                        : "text-gray-600"
+                    }`
+                  }
                 >
-                  Logout
-                </button>
+                  Login
+                </NavLink>
               </li>
-            </ul>
-          </div>
-        )}
+            )}
+          </ul>
+
+          {/* User Dropdown */}
+          {user && (
+            <div className="dropdown dropdown-end z-50">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-ghost btn-circle avatar"
+              >
+                <div
+                  className="w-10 h-10 rounded-full ring-2 ring-blue-500"
+                  title={user?.displayName}
+                >
+                  <img
+                    referrerPolicy="no-referrer"
+                    alt="User Profile"
+                    src={user?.photoURL}
+                    className="rounded-full w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content mt-3 z-[1] p-3 shadow-lg bg-white rounded-lg w-52 space-y-1"
+              >
+                <li>
+                  <NavLink
+                    to="/add-job"
+                    className={({ isActive }) =>
+                      `text-sm font-medium uppercase tracking-wide transition hover:text-blue-600 ${
+                        isActive
+                          ? "text-blue-600 border-b-2 border-blue-600 pb-1"
+                          : "text-gray-600"
+                      }`
+                    }
+                  >
+                    Add Job
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/my-posted-jobs"
+                    className={({ isActive }) =>
+                      `text-sm font-medium uppercase tracking-wide transition hover:text-blue-600 ${
+                        isActive
+                          ? "text-blue-600 border-b-2 border-blue-600 pb-1"
+                          : "text-gray-600"
+                      }`
+                    }
+                  >
+                    My Posted Jobs
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/my-bids"
+                    className={({ isActive }) =>
+                      `text-sm font-medium uppercase tracking-wide transition hover:text-blue-600 ${
+                        isActive
+                          ? "text-blue-600 border-b-2 border-blue-600 pb-1"
+                          : "text-gray-600"
+                      }`
+                    }
+                  >
+                    My Bids
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/bid-requests"
+                    className={({ isActive }) =>
+                      `text-sm font-medium uppercase tracking-wide transition hover:text-blue-600 ${
+                        isActive
+                          ? "text-blue-600 border-b-2 border-blue-600 pb-1"
+                          : "text-gray-600"
+                      }`
+                    }
+                  >
+                    Bid Requests
+                  </NavLink>
+                </li>
+                <li>
+                  <button
+                    onClick={logOut}
+                    className="w-full text-left px-3 py-2 rounded bg-red-50 text-red-600 hover:bg-red-100 transition"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </nav>
   );
 };
 

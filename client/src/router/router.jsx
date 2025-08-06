@@ -11,6 +11,7 @@ import UpdateJob from "../pages/UpdateJob";
 import JobDetails from "../pages/JobDetails";
 import MyBids from "../pages/MyBids";
 import BidRequests from "../pages/BidRequests";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -28,11 +29,19 @@ const router = createBrowserRouter([
       },
       {
         path: "/my-posted-jobs",
-        element: <MyPostedJobs></MyPostedJobs>,
+        element: (
+          <PrivateRoute>
+            <MyPostedJobs></MyPostedJobs>
+          </PrivateRoute>
+        ),
       },
       {
         path: "/jobs",
-        element: <AllJobs></AllJobs>,
+        element: (
+          <PrivateRoute>
+            <AllJobs></AllJobs>
+          </PrivateRoute>
+        ),
       },
       {
         path: "/login",
@@ -44,19 +53,35 @@ const router = createBrowserRouter([
       },
       {
         path: "/update/:id",
-        element: <UpdateJob></UpdateJob>,
+        element: (
+          <PrivateRoute>
+            <UpdateJob></UpdateJob>
+          </PrivateRoute>
+        ),
       },
       {
         path: "/job/:id",
-        element: <JobDetails></JobDetails>,
+        element: (
+          <PrivateRoute>
+            <JobDetails></JobDetails>
+          </PrivateRoute>
+        ),
       },
       {
         path: "/my-bids",
-        element: <MyBids></MyBids>,
+        element: (
+          <PrivateRoute>
+            <MyBids></MyBids>
+          </PrivateRoute>
+        ),
       },
       {
         path: "/bid-requests",
-        element: <BidRequests></BidRequests>,
+        element: (
+          <PrivateRoute>
+            <BidRequests></BidRequests>
+          </PrivateRoute>
+        ),
       },
     ],
   },

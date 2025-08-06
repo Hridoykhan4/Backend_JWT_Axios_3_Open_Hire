@@ -6,10 +6,8 @@ import useAuthValue from "../../hooks/useAuthValue";
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location?.state || "/";
-
+  const from = location?.state?.from || "/";
   const { signIn, signInWithGoogle } = useAuthValue();
-
   // Google Signin
   const handleGoogleSignIn = async () => {
     try {

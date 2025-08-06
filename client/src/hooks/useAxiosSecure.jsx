@@ -16,7 +16,8 @@ const useAxiosSecure = () => {
     const responseInterceptor = axiosInstance.interceptors.response.use(
       (res) => res,
       (err) => {
-        if (err.status === 401 || err.status === 403) {
+        console.log(err)
+        if (err?.response?.status === 401 || err?.response?.status === 403) {
           toast.error(err?.response?.data?.message || err.message);
           logOut().then(() => nav(`/login`));
         }

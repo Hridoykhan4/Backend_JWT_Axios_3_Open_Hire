@@ -9,8 +9,8 @@ const JobCard = ({ job = {} }) => {
     <MotionLink
       to={`/job/${job?._id}`}
       initial={{ opacity: 0, y: 2 }}
-      // animate={{ opacity: 1, y: 0 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0 }}
+      // whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       // whileHover={{ scale: 1.03 }}
       // whileTap={{ scale: 0.98 }}

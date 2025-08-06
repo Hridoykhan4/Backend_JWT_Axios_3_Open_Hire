@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 const corsOptions = {
-    origin: [`http://localhost:5173`],
+    origin: ["http://localhost:5173", "https://open-hire.web.app"],
     credentials: true
 }
 
@@ -59,21 +59,40 @@ async function run() {
         /* ****** JWT Related APIs Start  */
         app.post('/jwt', (req, res) => {
             const user = req.body;
-            const token = jwt.sign(user, process.env.OPEN_SECRET, { expiresIn: '10d' });
+            const token = jwt.sign(user, process.env.OPEN_SECRET, { expiresIn: '20d' });
             res.cookie('token', token, cookieOptions).send({ success: true })
         })
 
 
         app.get('/logout', (req, res) => {
-            res.clearCookie('token', process.env.OPEN_SECRET, { ...cookieOptions, maxAge: 0 }).send({ success: true })
+            res.clearCookie('token', { ...cookieOptions, maxAge: 0 }).send({ success: true })
         })
 
+
+        app.get('/totalJobsCount', async (req, res) => {
+            const { filter, search } = req.query;
+
+            let query = {}
+            if (filter) {
+                query.category = filter
+            }
+
+            if (search) {
+                query.job_title = { $regex: search, $options: 'i' }
+            }
+            const count = await jobsCollection.countDocuments(query);
+            res.send({ count })
+        })
 
         /* ****** JWT Related APIs End  */
 
         // Get All Jobs
         app.get('/jobs', async (req, res) => {
-            const { filter, search, sort } = req.query;
+
+            const page = parseInt(req.query.page) - 1;
+            const size = parseInt(req.query.size);
+
+            const { filter, search, sort, sortBySalary } = req.query;
             let query = {}
             if (filter) {
                 query = { category: filter }
@@ -90,7 +109,16 @@ async function run() {
                 cursor = cursor.sort({ deadline: -1 })
             }
 
-            const result = await cursor.toArray();
+
+            if (sortBySalary === 'asc') {
+                cursor = cursor.sort({ min_price: 1 })
+            }
+            else if (sortBySalary === "dsc") {
+                cursor = cursor.sort({ max_price: -1 })
+            }
+
+
+            const result = await cursor.skip(page * size).limit(size).toArray()
             res.send(result)
         })
 
