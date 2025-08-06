@@ -13,32 +13,43 @@ import {
 // import axios from "axios";
 import { AuthContext } from "../context/AuthContexts";
 import app from "../firebase/firebase.config";
-
+import axios from "axios";
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
-
+const axiosSecure = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
+});
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const createUser = (email, password) => {
+  const createUser = async (email, password) => {
     setLoading(true);
-    return createUserWithEmailAndPassword(auth, email, password);
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    await axiosSecure.post("/jwt", { email: result.user.email });
+    return result;
   };
 
-  const signIn = (email, password) => {
+  const signIn = async (email, password) => {
     setLoading(true);
-    return signInWithEmailAndPassword(auth, email, password);
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    await axiosSecure.post("/jwt", { email: result.user.email });
+    return result;
   };
 
-  const signInWithGoogle = () => {
+  const signInWithGoogle = async () => {
     setLoading(true);
-    return signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
+    await axiosSecure.post("/jwt", { email: result.user.email });
+    return result;
   };
 
-  const logOut = () => {
+  const logOut = async () => {
     setLoading(true);
-    return signOut(auth);
+    const result = await signOut(auth);
+    await axiosSecure("/logout");
+    return result;
   };
 
   const updateUserProfile = (name, photo) => {
@@ -51,7 +62,7 @@ const AuthProvider = ({ children }) => {
   // onAuthStateChange
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-    //   console.log("CurrentUser-->", currentUser);
+      //   console.log("CurrentUser-->", currentUser);
       setUser(currentUser);
       setLoading(false);
     });

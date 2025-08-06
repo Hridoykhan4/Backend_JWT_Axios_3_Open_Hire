@@ -4,12 +4,13 @@ import useAuthValue from "../hooks/useAuthValue";
 import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import useScrollTo from "../hooks/useScrollTo";
 
 const MyBids = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
   const { user } = useAuthValue();
-
+  useScrollTo();
   const categoryBadge = (category) => {
     const categorySample = {
       "Web Development": " text-blue-500 bg-blue-100/60",

@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
@@ -10,9 +12,31 @@ const corsOptions = {
     credentials: true
 }
 
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+};
+
+
 // MiddleWares
 app.use(cors(corsOptions))
 app.use(express.json());
+app.use(cookieParser());
+// Custom verify token
+const verifyToken = (req, res, next) => {
+    const token = req?.cookies?.token;
+    if (!token) {
+        return res.status(401).send({ message: "Unauthorized Access" })
+    }
+    jwt.verify(token, process.env.OPEN_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).send({ message: "Unauthorized Access" })
+        }
+        req.user = decoded;
+        next()
+    })
+}
 
 
 const uri = `mongodb+srv://${process.env.OPEN_USER}:${process.env.OPEN_PASS}@liviing-hire-employer-e.qe99pmf.mongodb.net/?retryWrites=true&w=majority&appName=liviing-hire-employer-employees`;
@@ -30,6 +54,22 @@ async function run() {
     try {
         const jobsCollection = client.db('Open-hire').collection('jobs');
         const bidsCollection = client.db('Open-hire').collection('bids');
+
+
+        /* ****** JWT Related APIs Start  */
+        app.post('/jwt', (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.OPEN_SECRET, { expiresIn: '10d' });
+            res.cookie('token', token, cookieOptions).send({ success: true })
+        })
+
+
+        app.get('/logout', (req, res) => {
+            res.clearCookie('token', process.env.OPEN_SECRET, { ...cookieOptions, maxAge: 0 }).send({ success: true })
+        })
+
+
+        /* ****** JWT Related APIs End  */
 
         // Get All Jobs
         app.get('/jobs', async (req, res) => {
@@ -121,8 +161,14 @@ async function run() {
 
 
         // Get all bids a specific user made
-        app.get('/my-bids/:email', async (req, res) => {
+        /* *********** */
+        /* *********** */
+        /* *********** */
+        app.get('/my-bids/:email', verifyToken, async (req, res) => {
             const { email } = req.params;
+            if (req.user?.email !== email) {
+                return res.status(403).send({ message: "Forbidden Access" })
+            }
             const query = { bidder_email: email };
             const result = await bidsCollection.find(query).toArray();
             res.send(result)
@@ -130,8 +176,11 @@ async function run() {
 
 
         // Get all bid requests posted by all bidders
-        app.get('/bid-requests/:email', async (req, res) => {
+        app.get('/bid-requests/:email', verifyToken, async (req, res) => {
             const { email } = req.params;
+            if (req.user?.email !== email) {
+                return res.status(403).send({ message: "Forbidden Access" })
+            }
             const query = { 'buyer.email': email };
             const result = await bidsCollection.find(query).toArray();
             res.send(result)
@@ -154,9 +203,6 @@ async function run() {
         Bid related APIs End
         **********/
 
-
-
-        await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
 

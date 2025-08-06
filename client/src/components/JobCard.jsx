@@ -8,11 +8,12 @@ const JobCard = ({ job = {} }) => {
   return (
     <MotionLink
       to={`/job/${job?._id}`}
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 2 }}
+      // animate={{ opacity: 1, y: 0 }}
+      whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.98 }}
+      // whileHover={{ scale: 1.03 }}
+      // whileTap={{ scale: 0.98 }}
       className="group w-full max-w-sm px-6 py-6 rounded-2xl bg-white border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.05)] hover:border-blue-300 transition-all duration-300"
     >
       {/* Buyer Info */}

@@ -47,7 +47,7 @@ const AllJobs = () => {
     );
 
   return (
-    <div className="container px-6 py-10 mx-auto min-h-[calc(100vh-306px)]">
+    <div className="container px-6 py-10 mx-auto">
       {/* Controls */}
       <div className="flex flex-col md:flex-row justify-center items-center gap-4 flex-wrap mb-10">
         {/* Filter */}

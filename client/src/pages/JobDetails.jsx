@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import useAuthValue from "../hooks/useAuthValue";
 import LoadingSpinner from "../components/LoadingSpinner";
 import toast from "react-hot-toast";
+import useScrollTo from "../hooks/useScrollTo";
 
 const JobDetails = () => {
   const axiosSecure = useAxiosSecure();
@@ -16,7 +17,7 @@ const JobDetails = () => {
   const { user } = useAuthValue();
   const queryClient = useQueryClient();
   const [startDate, setStartDate] = useState(new Date());
-
+  useScrollTo();
   const {
     register,
     handleSubmit,
@@ -110,9 +111,6 @@ const JobDetails = () => {
       }
     }
   };
-
-
-
 
   return (
     <div className="flex flex-col md:flex-row justify-around gap-5 items-center min-h-[calc(100vh-306px)] md:max-w-screen-xl mx-auto">
